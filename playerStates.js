@@ -31,7 +31,7 @@ export class Sitting extends State{
     {
       this.player.setState(states.JUMPING);
     }
-    else if (!keys.includes('ArrowDown'))
+    else if (keys.length === 0)
     {
       this.player.setState(states.STANDING)
     }
@@ -49,7 +49,6 @@ export class Running extends State{
     this.player.maxFrame = 8;
   }
   handleInput(keys) {
-    console.log(keys)
     if (keys.includes('ArrowDown') && !keys.includes('ArrowRight') && !keys.includes('ArrowLeft'))
     {
       this.player.setState(states.SITTING);
@@ -68,7 +67,7 @@ export class Jumping extends State{
     this.player = player;
   }
   enter() {
-    if (this.player.onGround()) this.player.vy = -34.5;
+    if (this.player.onGround()) this.player.vy = -33;
     this.player.frameY = 1;
     this.player.frameX = 0;
     this.player.maxFrame = 5;
@@ -112,7 +111,7 @@ export class Standing extends State{
     this.player = player;
   }
   enter() {
-    this.player.frameY = 5;
+    this.player.frameY = 0;
     this.player.frameX = 0;
     this.player.maxFrame = 5;
   }

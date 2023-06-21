@@ -12,6 +12,7 @@ class Game {
     {
       this.width = width;
       this.height = height;
+      this.groundMargin = 50;
       this.player = new Player(this);
       this.input = new InputHandler();
     }
@@ -29,13 +30,13 @@ class Game {
   const game = new Game(canvas.width, canvas.height);
 
   let lastTime = 0;
+  console.log(game.player.frameY);
 
   function animate(timestamp){
     const deltaTime = timestamp - lastTime;
     lastTime = timestamp;
-
     game.draw(ctx);
-    game.update();
+    game.update(deltaTime);
     requestAnimationFrame(animate);
   }
 

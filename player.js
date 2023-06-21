@@ -9,13 +9,14 @@ export class Player {
     this.widthInCanvas = 100;
     this.heightInCanvas = 100;
     this.x = 0;
-    this.y = this.game.height - this.heightInCanvas;
+    this.y = this.game.height - this.heightInCanvas - this.game.groundMargin;
     this.weight = 1;
     this.vy = 0;
     this.image = document.getElementById('player');
     this.maxFrame = 5;
     this.fps = 20;
     this.frameInterval = 1000/this.fps;
+    this.frameTimer = 0;
     this.frameX = 0;
     this.frameY = 0;
     this.speed = 0;
@@ -38,8 +39,16 @@ export class Player {
     if (!this.onGround()) this.vy += this.weight;
     else this.vy = 0;
     //sprite Animation
-    if (this.frameX < this.maxFrame) this.frameX++;
-    else this.frameX = 0;
+    console.log(deltaTime);
+    if (this.frameTimer > this.frameInterval)
+    {
+      this.frameTimer = 0;
+      if (this.frameX < this.maxFrame) this.frameX++;
+      else this.frameX = 0;
+    }
+    else{
+      this.frameTimer += deltaTime;
+    }
   }
   draw(ctx)
   {
@@ -48,7 +57,7 @@ export class Player {
   }
   onGround()
   {
-    return this.y >= this.game.height - this.heightInCanvas;
+    return this.y >= this.game.height - this.heightInCanvas - this.game.groundMargin;
   }
   setState(state)
   {
