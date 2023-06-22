@@ -26,6 +26,7 @@ export class Player {
   }
   update(keys, deltaTime)
   {
+    this.checkCollision();
     this.currentState.handleInput(keys);
     // Horizontal movement
     this.x += this.speed;
@@ -39,7 +40,6 @@ export class Player {
     if (!this.onGround()) this.vy += this.weight;
     else this.vy = 0;
     //sprite Animation
-    console.log(deltaTime);
     if (this.frameTimer > this.frameInterval)
     {
       this.frameTimer = 0;
@@ -52,6 +52,7 @@ export class Player {
   }
   draw(ctx)
   {
+    if (this.game.debug) ctx.strokeRect(this.x, this.y, this.widthInCanvas, this.heightInCanvas);
     ctx.fillStyle = 'red';
     ctx.drawImage(this.image, this.frameX * this.width, this.frameY * this.height, this.width, this.height, this.x, this.y, this.widthInCanvas, this.heightInCanvas);
   }
@@ -59,9 +60,19 @@ export class Player {
   {
     return this.y >= this.game.height - this.heightInCanvas - this.game.groundMargin;
   }
-  setState(state)
+  setState(state, speed)
   {
     this.currentState = this.states[state];
+    this.game.speed = this.game.maxSpeed * speed;
     this.currentState.enter(state);
+  }
+  checkCollision(){
+    this.game.enemies = this.game.enemies.filter(enemy => {
+      if (enemy.x < this.x + this.widthInCanvas && enemy.x + enemy.width / 3 > this.x && enemy.y < this.y + this.heightInCanvas && enemy.y + enemy.height / 3 > this.y){
+        this.game.score++;
+        return false;
+      }
+      return true;
+    });
   }
 }
