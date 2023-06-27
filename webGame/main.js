@@ -23,14 +23,22 @@ class Game {
       this.input = new InputHandler(this);
       this.UI = new UI(this);
       this.enemies = [];
+      this.particles = [];
+      this.collisions = [];
       this.enemyTimer = 0;
       this.enemyInterval = 1000;
       this.debug = true;
       this.score = 0;
       this.fontColor = 'black';
+      this.time = 0;
+      this.maxTime = 60000;
+      this.gameOver = false;
+      this.player.currentState = this.player.states[0];
+      this.player.currentState.enter();
     }
     update(deltaTime)
     {
+      this.time += deltaTime;
       this.background.update();
 
       this.player.update(this.input.keys, deltaTime);
@@ -41,11 +49,16 @@ class Game {
       } else {
         this.enemyTimer += deltaTime;
       }
+      this.collisions = this.collisions.filter(collision => {
+        collision.update(deltaTime);
+        return collision.frameX < collision.maxFrame;
+      })
       this.enemies = this.enemies.filter(enemy => {
         enemy.update(deltaTime);
 
         return enemy.x + enemy.width > 0 && enemy.y > -enemy.height - 10;
-      })
+      });
+      if(this.time > this.maxTime) this.gameOver = true;
     }
     draw(ctx)
     {
@@ -55,6 +68,15 @@ class Game {
       this.enemies.forEach(enemy => {
         enemy.draw(ctx);
       })
+      this.particles = this.particles.filter(particle => {
+        particle.update();
+        particle.draw(ctx);
+        return particle.size > 0.5;
+      })
+      this.collisions = this.collisions.filter(collision => {
+        collision.draw(ctx);
+        return collision.frameX < collision.maxFrame;
+      })
       this.UI.draw(ctx);
     }
     addEnemy(){
@@ -63,22 +85,21 @@ class Game {
       else if (this.speed > 0)
         this.enemies.push(new ClimbingEnemy(this));
       this.enemies.push(new FlyingEnemy(this));
-      console.log(this.enemies);
     }
   }
 
   const game = new Game(canvas.width, canvas.height);
 
   let lastTime = 0;
-  console.log(game.player.frameY);
-
   function animate(timestamp){
     const deltaTime = timestamp - lastTime;
     lastTime = timestamp;
-    game.draw(ctx);
     game.update(deltaTime);
-    requestAnimationFrame(animate);
+    game.draw(ctx);
+    if (!game.gameOver)
+      requestAnimationFrame(animate);
   }
+
 
   animate(0);
 });
